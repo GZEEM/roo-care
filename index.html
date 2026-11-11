@@ -112,7 +112,7 @@ main{padding-bottom:calc(var(--bot) + 64px)}
 .fl:last-child{padding-bottom:24.2px}
 .fl .k{font-size:12.9px;line-height:16px;letter-spacing:.2px;color:var(--cap);text-transform:uppercase}
 .fl .v{font-size:15.7px;line-height:19.9px;margin-top:5.2px;color:var(--ink2)}
-.dt{padding:13.6px 0 12.3px;font-size:16.4px;line-height:19.9px;color:var(--ink2);position:relative}
+.dt{padding:15.05px 0 13.75px;font-size:16.4px;line-height:19.9px;color:var(--ink2);position:relative}
 .dt + .dt:before{content:"";position:absolute;left:0;right:0;top:0;border-top:1px solid var(--line)}
 .dh + .dt{padding-top:16.8px}
 .dt:last-child{padding-bottom:24.2px}
@@ -176,19 +176,19 @@ const KEY='roo-care-v1';
 function VAX_SEED(){return [
   {id:'v1',title:'Canine Influenza',product:'Influenza H3N2',cut:true,date:'2026-11-11',next:'2026-12-02',site:'Left front leg',provider:'Dr. Jose da Silva'},
   {id:'v2',title:'Bordetella',product:'Bordetella Vaccine, Or',cut:true,date:'2026-11-09',next:'2027-11-09',site:'Oral',provider:'Kristen Norman'},
-  {id:'v3',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'',sort:'2026-05-01',next:'2026-05-25',site:'',provider:''},
+  {id:'v3',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'2026-05-04',next:'2026-05-25',site:'Left rear leg',provider:'Dr. Lauren Prince'},
   {id:'v4',title:'Distemper & Parvovirus',product:'DA2PP Va',cut:true,date:'2026-04-01',next:'2029-04-01',site:'Right front leg',provider:'Dr. Julie Storm'},
   {id:'v5',title:'Rabies',product:'Rabies Vaccine CA 1 & 3 Y',cut:true,date:'2025-10-07',next:'2028-10-07',site:'Right rear leg',provider:'Dr. Julie Storm'},
-  {id:'v6',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'',sort:'2024-12-31',next:'2025-12-03',site:'',provider:''},
+  {id:'v6',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'2024-12-03',next:'2025-12-03',site:'',provider:''},
   {id:'v7',title:'Bordetella',product:'Bordetella Vaccine, Or',cut:true,date:'2024-11-07',next:'2025-11-07',site:'',provider:''},
-  {id:'v8',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'',sort:'2024-01-01',next:'',site:'',provider:''}
+  {id:'v8',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'2024-11-07',next:'',site:'',provider:''}
 ]}
 function VAX_INFO(){return {
   'Canine Influenza':{desc:'This vaccine protects against the two main strains of Canine Influenza.',extra:['2025-05-27']},
   'Bordetella':{desc:'This is an oral vaccine to help prevent Canine Infectious Respiratory Disease (CIRD) in dogs. This disease is sometimes called "Kennel Cough".',extra:[]},
   'Distemper & Parvovirus':{desc:'This is a vaccine against Canine Distemper, Adenovirus type 2, Parainfluenza and Parvovirus.',extra:['2024-11-07']},
   'Rabies':{desc:'This vaccine helps protect dogs against rabies virus for one to three years depending on their age when they receive it.',extra:['2024-09-11']},
-  'Leptospirosis':{desc:'',extra:[]}
+  'Leptospirosis':{desc:'This canine vaccination protects against 4 strains of the bacterial disease Leptospirosis.',extra:[]}
 }}
 const SEED={
   owner:{name:'Guy Romilly'},
@@ -211,12 +211,12 @@ const SEED={
   ],
   records:{summaries:[], weights:[], labs:[], prescriptions:[], vaccinations:VAX_SEED(), estimates:[], invoices:[]},
   vaxInfo:VAX_INFO(),
-  v:3
+  v:4
 };
 let S;
 try{ S=JSON.parse(localStorage.getItem(KEY)) || structuredClone(SEED); }catch(e){ S=structuredClone(SEED); }
 const save=()=>localStorage.setItem(KEY, JSON.stringify(S));
-if(!S.v||S.v<3){ // earlier test versions: reset to the screenshot data, keep a changed photo
+if(!S.v||S.v<4){ // earlier test versions: reset to the screenshot data, keep a changed photo
   const photo=S.pet&&S.pet.photo; S=structuredClone(SEED); if(photo) S.pet.photo=photo; save();
 }
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
