@@ -257,7 +257,7 @@ function tabbar(){
   const t=(k,lab,ic)=>{const on=tab===k;return `<button class="tab ${on?'on':''}" onclick="go('${k}')">${I[ic].replace('SW',on?'2.3':'1.8')}<span>${lab}</span></button>`};
   return `<nav class="tabs">${t('home','Home','tHome')}${t('records','Records','tRec')}${t('care','Care Plan','tCare')}${t('account','Account','tAcct')}</nav>`;
 }
-function render(){const top=stack[stack.length-1];app.innerHTML=(top?PAGES[top.p](top.a):VIEWS[tab]())+tabbar()}
+function render(){const top=stack[stack.length-1];app.innerHTML=top?PAGES[top.p](top.a):VIEWS[tab]()+tabbar()} // inner pages have no tab bar, as in the screenshots
 function go(k){tab=k;stack=[];render();scrollTo(0,0)}
 function push(p,a){stack.push({p,a});render();scrollTo(0,0)}
 function pop(){stack.pop();render()}
