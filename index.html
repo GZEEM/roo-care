@@ -25,7 +25,12 @@
 html.sim{--top:50px;--bot:34px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0}
 html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-variant-numeric:proportional-nums;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overscroll-behavior:none}
-body{-webkit-user-select:none;user-select:none}
+body{-webkit-user-select:none;user-select:none;overscroll-behavior-x:none}
+button,a{touch-action:manipulation}
+#app{position:relative;z-index:2;background:var(--bg);min-height:100vh}
+#app.drag{box-shadow:-8px 0 24px rgba(52,28,3,.12)}
+.under{position:fixed;inset:0;z-index:1;overflow:hidden;background:var(--bg);pointer-events:none}
+.under:after{content:"";position:absolute;inset:0;background:rgba(52,28,3,.06)}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
 a{color:inherit;text-decoration:none}
 svg{display:block}
@@ -38,7 +43,7 @@ svg{display:block}
 /* list-page header (back + big title) */
 .hdr.lst{height:calc(var(--top) + 100.2px)}
 .hdr.lst h1{top:calc(var(--top) + 57px)}
-.back{position:absolute;left:14px;top:calc(var(--top) + 9px);width:28px;height:28px;display:grid;place-items:center}
+.back{position:absolute;left:6px;top:calc(var(--top) + 1px);width:44px;height:44px;display:grid;place-items:center;z-index:3}
 /* detail-page header */
 .hdr.det{height:calc(var(--top) + 96.1px)}
 .hdr.det .ttl{position:absolute;left:0;right:0;text-align:center;top:calc(var(--top) + 14.7px);font-size:16px;font-weight:500;line-height:20px;color:var(--ink2)}
@@ -259,9 +264,36 @@ function tabbar(){
   return `<nav class="tabs">${t('home','Home','tHome')}${t('records','Records','tRec')}${t('care','Care Plan','tCare')}${t('account','Account','tAcct')}</nav>`;
 }
 function render(){const top=stack[stack.length-1];app.innerHTML=top?PAGES[top.p](top.a):VIEWS[tab]()+tabbar()} // inner pages have no tab bar, as in the screenshots
+let tabY=0;
 function go(k){tab=k;stack=[];render();scrollTo(0,0)}
-function push(p,a){stack.push({p,a});render();scrollTo(0,0)}
-function pop(){stack.pop();render()}
+function push(p,a){const cur=stack[stack.length-1];if(cur)cur.y=scrollY;else tabY=scrollY;stack.push({p,a});render();scrollTo(0,0)}
+function pop(){if(!stack.length)return;stack.pop();render();const cur=stack[stack.length-1];scrollTo(0,cur?(cur.y||0):tabY)}
+function prevHtml(){const s=stack.slice(0,-1),t=s[s.length-1];return t?PAGES[t.p](t.a):VIEWS[tab]()+tabbar()}
+
+/* swipe from the left edge to go back, like a normal iPhone app */
+let sw=null;
+document.addEventListener('touchstart',e=>{
+  if(!stack.length||document.querySelector('.scrim'))return;
+  const t=e.touches[0]; if(t.clientX>30)return;
+  sw={x:t.clientX,y:t.clientY,t:Date.now(),dx:0,lock:null,under:null};
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+  if(!sw)return; const t=e.touches[0], dx=t.clientX-sw.x, dy=t.clientY-sw.y;
+  if(!sw.lock){ if(Math.abs(dx)>6&&Math.abs(dx)>Math.abs(dy)){sw.lock='h';
+      const u=document.createElement('div');u.className='under';u.innerHTML=prevHtml();document.body.appendChild(u);sw.under=u;app.classList.add('drag');}
+    else if(Math.abs(dy)>6){sw=null;return} }
+  if(sw.lock==='h'){ e.preventDefault(); sw.dx=Math.max(0,dx); const w=innerWidth;
+    app.style.transform=`translateX(${sw.dx}px)`; sw.under.style.transform=`translateX(${-w*0.3+sw.dx*0.3}px)`; }
+},{passive:false});
+document.addEventListener('touchend',()=>{
+  if(!sw)return; const s=sw; sw=null; if(s.lock!=='h')return;
+  const w=innerWidth, fast=s.dx/(Date.now()-s.t)>0.45, done=s.dx>w*0.33||(fast&&s.dx>40);
+  const ease='transform .22s cubic-bezier(.2,.8,.2,1)';
+  app.style.transition=ease; s.under.style.transition=ease;
+  app.style.transform=`translateX(${done?w:0}px)`; s.under.style.transform=`translateX(${done?0:-w*0.3}px)`;
+  setTimeout(()=>{app.style.transition='';app.style.transform='';app.classList.remove('drag');s.under.remove();if(done)pop();},230);
+});
+document.addEventListener('touchcancel',()=>{if(sw&&sw.under){sw.under.remove();app.style.transform='';app.classList.remove('drag')}sw=null});
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2000)}
 
 /* row builders */
