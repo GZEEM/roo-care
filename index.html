@@ -187,7 +187,7 @@ function VAX_SEED(){return [
   {id:'v5',title:'Rabies',product:'Rabies Vaccine CA 1 & 3 Y',cut:true,date:'2025-10-07',next:'2028-10-07',site:'Right rear leg',provider:'Dr. Julie Storm'},
   {id:'v6',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'2024-12-03',next:'2025-12-03',site:'',provider:''},
   {id:'v7',title:'Bordetella',product:'Bordetella Vaccine, Or',cut:true,date:'2024-11-07',next:'2025-11-07',site:'',provider:''},
-  {id:'v8',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'2024-11-07',next:'',site:'',provider:''}
+  {id:'v8',title:'Leptospirosis',product:'Lepto 4 Vaccine - C',cut:true,date:'2024-11-07',next:'2024-12-03',site:'',provider:''} /* next due not visible in screenshot; set to the next Lepto dose (12/3/2024) */
 ]}
 function VAX_INFO(){return {
   'Canine Influenza':{desc:'This vaccine protects against the two main strains of Canine Influenza.',extra:['2025-05-27']},
@@ -217,12 +217,12 @@ const SEED={
   ],
   records:{summaries:[], weights:[], labs:[], prescriptions:[], vaccinations:VAX_SEED(), estimates:[], invoices:[]},
   vaxInfo:VAX_INFO(),
-  v:4
+  v:5
 };
 let S;
 try{ S=JSON.parse(localStorage.getItem(KEY)) || structuredClone(SEED); }catch(e){ S=structuredClone(SEED); }
 const save=()=>localStorage.setItem(KEY, JSON.stringify(S));
-if(!S.v||S.v<4){ // earlier test versions: reset to the screenshot data, keep a changed photo
+if(!S.v||S.v<5){ // earlier test versions: reset to the screenshot data, keep a changed photo
   const photo=S.pet&&S.pet.photo; S=structuredClone(SEED); if(photo) S.pet.photo=photo; save();
 }
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -378,7 +378,7 @@ const PAGES={
   if(k==='vaccinations'){
     const info=(S.vaxInfo||{})[e.title]||{}, same=S.records[k].filter(x=>x.title===e.title);
     const pick=f=>e[f]||(same.filter(x=>x[f]).sort((a,b)=>(b.date||b.sort).localeCompare(a.date||a.sort))[0]||{})[f]||'';
-    det=fl('Description',esc(info.desc))+fl('Site',esc(pick('site')))+fl('Provider',esc(pick('provider')))+fl('Next due',e.next?longDate(e.next):'');
+    det=fl('Description',esc(info.desc))+fl('Site',esc(pick('site')))+fl('Provider',esc(pick('provider')))+fl('Next due',(()=>{const n=same.filter(x=>x.next).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];return n?longDate(n.next):''})()); // same details whichever row is opened
     dates=[...new Set([...(info.extra||[]),...same.map(x=>x.date).filter(Boolean)])].sort().map(mdyFull);
   }
   return hdrDet(`${REC[k][1]} details`,e.title)+`<main>
